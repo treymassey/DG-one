@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bedrock Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-hcl.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background:#0f172a; color:#e5e7eb; }
+    pre { border-radius: 12px; padding: 16px; }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <h1>Bedrock Example</h1>
+  <a href="../index.html">← Back to Diagram</a>
+
+  <pre><code class="language-hcl">
+# Optional Step Functions
+{
+  "Comment": "Project-Dev Bot Orchestration",
+  "StartAt": "AnalyzeIntent",
+  "States": {
+    "AnalyzeIntent": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCT:function:Project-Dev-BedrockFn",
+      "Parameters": {
+        "prompt.$": "$.userInput"
+      },
+      "ResultPath": "$.analysis",
+      "Next": "RouteIntent"
+    },
+    "RouteIntent": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.analysis.intent",
+          "StringEquals": "GraphCalendar",
+          "Next": "CallGraphCalendar"
+        },
+        {
+          "Variable": "$.analysis.intent",
+          "StringEquals": "GraphChat",
+          "Next": "CallGraphChat"
+        }
+      ],
+      "Default": "RespondDefault"
+    },
+    "CallGraphCalendar": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCT:function:Project-Dev-GraphFn",
+      "Parameters": {
+        "action": "calendar",
+        "details.$": "$.analysis.details"
+      },
+      "ResultPath": "$.calendarResp",
+      "Next": "ConfirmToUser"
+    },
+    "CallGraphChat": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCT:function:Project-Dev-GraphFn",
+      "Parameters": {
+        "action": "sendtest",
+        "chatId.$": "$.analysis.chatId"
+      },
+      "ResultPath": "$.chatResp",
+      "Next": "ConfirmToUser"
+    },
+    "RespondDefault": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:REGION:ACCT:function:Project-Dev-BedrockFn",
+      "Parameters": {
+        "prompt": "Default fallback response"
+      },
+      "End": true
+    },
+    "ConfirmToUser": {
+      "Type": "Succeed"
+    }
+  }
+}
+
+}
+  </code></pre>
+</body>
+</html>

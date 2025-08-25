@@ -1,36 +1,224 @@
-<!--?xml version="1.0" encoding="UTF-8"?-->
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 400" width="100%" height="100%">
-  <style>
-    .node { fill:#e5f0ff; stroke:#1f4aff; stroke-width:2; rx:12; ry:12; }
-    .label { font: 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; fill:#0b1220; }
-    a:hover .node { fill:#d6e7ff; }
-    a { cursor: pointer; }
-  </style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1200" height="800" viewBox="0 0 1200 800"
+     role="img" aria-labelledby="title desc">
+  <title id="title">Teams ↔ AWS Bedrock Integration Diagram</title>
+  <desc id="desc">Interactive architecture diagram showing Microsoft Teams messaging into an AWS bot backend that calls Amazon Bedrock and Microsoft Graph API, with links for each component.</desc>
 
-  <!-- Title -->
-  <text x="400" y="40" text-anchor="middle" class="label" style="font-weight:600; font-size:20px">
-    Sample Diagram (Bedrock ⇄ Lamda)
-  </text>
-
-  <!-- Bedrock -->
-  <a xlink:href="objects/Bedrock.html" href="objects/Bedrock.html">
-    <title>Bedrock: click to open objects/Bedrock.html</title>
-    <rect class="node" x="120" y="140" width="220" height="90"></rect>
-    <text class="label" x="230" y="195" text-anchor="middle" pointer-events="none">Bedrock</text>
-  </a>
-
-  <!-- Connector arrow -->
+  <!-- defs -->
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
-      <path d="M0,0 L10,4 L0,8 Z" fill="#1f4aff"></path>
+    <style><![CDATA[
+      .zone {
+        fill: #f8fafc;
+        stroke: #94a3b8;
+        stroke-dasharray: 6 6;
+      }
+      .zone-title {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        font-size: 16px;
+        font-weight: 700;
+        fill: #0f172a;
+      }
+      .node rect {
+        fill: #ffffff;
+        stroke: #334155;
+        rx: 14; ry: 14;
+      }
+      .node text {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        font-size: 15px;
+        font-weight: 600;
+        fill: #0f172a;
+        pointer-events: none;
+      }
+      .node .sub {
+        font-size: 12px;
+        font-weight: 500;
+        fill: #475569;
+      }
+      .node:hover rect {
+        filter: url(#glow);
+        stroke-width: 2.2;
+      }
+      a:hover { cursor: pointer; }
+      .edge {
+        stroke: #334155;
+        stroke-width: 2;
+        fill: none;
+        marker-end: url(#arrow);
+      }
+      .edge-dashed { stroke-dasharray: 5 6; }
+      .flow-dot {
+        fill: #334155;
+        stroke: none;
+      }
+      .legend {
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+        font-size: 12px;
+        fill: #334155;
+      }
+    ]]></style>
+
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#93c5fd" flood-opacity="0.8"/>
+    </filter>
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5"
+            markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
     </marker>
   </defs>
-  <line x1="340" y1="185" x2="460" y2="185" stroke="#1f4aff" stroke-width="2" marker-end="url(#arrow)"></line>
 
-  <!-- Lamda -->
-  <a xlink:href="objects/Lamda.html" href="objects/Lamda.html">
-    <title>Lamda: click to open objects/Lamda.html</title>
-    <rect class="node" x="460" y="140" width="220" height="90"></rect>
-    <text class="label" x="570" y="195" text-anchor="middle" pointer-events="none">Lamda</text>
+  <!-- Zones -->
+  <g>
+    <rect class="zone" x="20" y="40" width="300" height="720" />
+    <text class="zone-title" x="30" y="70">Microsoft 365 / Entra</text>
+  </g>
+  <g>
+    <rect class="zone" x="360" y="40" width="380" height="720" />
+    <text class="zone-title" x="370" y="70">AWS - Bot &amp; Edge</text>
+  </g>
+  <g>
+    <rect class="zone" x="770" y="40" width="410" height="720" />
+    <text class="zone-title" x="780" y="70">AWS - AI &amp; Data</text>
+  </g>
+
+  <!-- Nodes: Microsoft 365 -->
+  <a xlink:href="objects/Teams.html" target="_top" aria-label="Microsoft Teams">
+    <g class="node" transform="translate(60,110)">
+      <title>Microsoft Teams (channel, user messages)</title>
+      <rect width="240" height="60"/>
+      <text x="120" y="30" text-anchor="middle">Microsoft Teams</text>
+      <text x="120" y="48" class="sub" text-anchor="middle">User &amp; channel messages</text>
+    </g>
   </a>
+
+  <a xlink:href="objects/GraphAPI.html" target="_top" aria-label="Microsoft Graph API">
+    <g class="node" transform="translate(60,220)">
+      <title>Microsoft Graph API (emails, scheduling, Teams)</title>
+      <rect width="240" height="60"/>
+      <text x="120" y="36" text-anchor="middle">Microsoft Graph API</text>
+    </g>
+  </a>
+
+  <a xlink:href="objects/EntraApp.html" target="_top" aria-label="Entra ID App Registration">
+    <g class="node" transform="translate(60,330)">
+      <title>Entra ID (Azure AD) App Registration for bot OAuth</title>
+      <rect width="240" height="60"/>
+      <text x="120" y="30" text-anchor="middle">Entra ID App Reg</text>
+      <text x="120" y="48" class="sub" text-anchor="middle">Client ID / Secret / Cert</text>
+    </g>
+  </a>
+
+  <!-- Nodes: AWS Edge -->
+  <a xlink:href="objects/APIGateway.html" target="_top" aria-label="Amazon API Gateway">
+    <g class="node" transform="translate(380,110)">
+      <title>Amazon API Gateway (public bot endpoint for Teams)</title>
+      <rect width="340" height="60"/>
+      <text x="170" y="30" text-anchor="middle">Amazon API Gateway</text>
+      <text x="170" y="48" class="sub" text-anchor="middle">Bot HTTPS endpoint</text>
+    </g>
+  </a>
+
+  <a xlink:href="objects/Lambda.html" target="_top" aria-label="AWS Lambda Bot Backend">
+    <g class="node" transform="translate(380,220)">
+      <title>AWS Lambda (bot logic: auth, routing, calls to Bedrock &amp; Graph)</title>
+      <rect width="340" height="60"/>
+      <text x="170" y="30" text-anchor="middle">AWS Lambda (Bot Backend)</text>
+      <text x="170" y="48" class="sub" text-anchor="middle">Auth, Orchestration, RAG</text>
+    </g>
+  </a>
+
+  <a xlink:href="objects/Cognito.html" target="_top" aria-label="Amazon Cognito (optional)">
+    <g class="node" transform="translate(380,330)">
+      <title>Amazon Cognito (optional end-user auth/session)</title>
+      <rect width="340" height="60"/>
+      <text x="170" y="36" text-anchor="middle">Amazon Cognito (optional)</text>
+    </g>
+  </a>
+
+  <a xlink:href="objects/CloudWatch.html" target="_top" aria-label="Amazon CloudWatch">
+    <g class="node" transform="translate(380,440)">
+      <title>Amazon CloudWatch (logs, metrics, alarms)</title>
+      <rect width="340" height="60"/>
+      <text x="170" y="36" text-anchor="middle">Amazon CloudWatch</text>
+    </g>
+  </a>
+
+  <!-- Nodes: AWS AI & Data -->
+  <a xlink:href="objects/Bedrock.html" target="_top" aria-label="Amazon Bedrock">
+    <g class="node" transform="translate(790,110)">
+      <title>Amazon Bedrock (foundation models, agents, knowledge base)</title>
+      <rect width="370" height="60"/>
+      <text x="185" y="30" text-anchor="middle">Amazon Bedrock</text>
+      <text x="185" y="48" class="sub" text-anchor="middle">FM inference / Agents</text>
+    </g>
+  </a>
+
+  <a xlink:href="objects/StepFunctions.html" target="_top" aria-label="AWS Step Functions">
+    <g class="node" transform="translate(790,220)">
+      <title>AWS Step Functions (optional multi-step orchestration)</title>
+      <rect width="370" height="60"/>
+      <text x="185" y="36" text-anchor="middle">AWS Step Functions (optional)</text>
+    </g>
+  </a>
+
+  <a xlink:href="objects/S3.html" target="_top" aria-label="Amazon S3 (prompts, logs, RAG data)">
+    <g class="node" transform="translate(790,330)">
+      <title>Amazon S3 (prompt/templates, logs, documents for RAG)</title>
+      <rect width="370" height="60"/>
+      <text x="185" y="30" text-anchor="middle">Amazon S3</text>
+      <text x="185" y="48" class="sub" text-anchor="middle">Prompts, Logs, RAG data</text>
+    </g>
+  </a>
+
+  <!-- Edges -->
+  <!-- (1) Teams -> API Gateway -->
+  <path class="edge" d="M300,140 C330,140 350,140 380,140" />
+  <circle class="flow-dot" cx="340" cy="140" r="4" />
+  <text class="legend" x="305" y="132">1</text>
+
+  <!-- (2) API Gateway -> Lambda -->
+  <path class="edge" d="M550,170 C550,190 550,200 550,220" />
+  <circle class="flow-dot" cx="550" cy="195" r="4" />
+  <text class="legend" x="558" y="202">2</text>
+
+  <!-- (3) Lambda -> Bedrock -->
+  <path class="edge" d="M720,250 C750,250 760,140 790,140" />
+  <circle class="flow-dot" cx="755" cy="220" r="4" />
+  <text class="legend" x="735" y="232">3</text>
+
+  <!-- (4) Lambda -> Graph API -->
+  <path class="edge" d="M380,250 C350,250 300,250 300,250" />
+  <path class="edge edge-dashed" d="M300,250 C250,250 200,250 60,250" />
+  <circle class="flow-dot" cx="330" cy="250" r="4" />
+  <text class="legend" x="305" y="242">4</text>
+
+  <!-- (4b) Lambda -> Entra App Reg (OAuth) -->
+  <path class="edge edge-dashed" d="M380,260 C350,260 300,360 300,360" />
+  <path class="edge edge-dashed" d="M300,360 C250,360 200,360 60,360" />
+  <text class="legend" x="305" y="350">4b</text>
+
+  <!-- (5) Lambda -> S3 -->
+  <path class="edge" d="M720,250 C750,250 760,360 790,360" />
+  <circle class="flow-dot" cx="755" cy="290" r="4" />
+  <text class="legend" x="735" y="300">5</text>
+
+  <!-- (6) Lambda -> CloudWatch -->
+  <path class="edge" d="M550,280 C550,320 550,360 550,440" />
+  <circle class="flow-dot" cx="550" cy="360" r="4" />
+  <text class="legend" x="558" y="355">6</text>
+
+  <!-- (6b) API Gateway -> CloudWatch -->
+  <path class="edge edge-dashed" d="M550,170 C650,170 650,470 720,470 660,470 610,470 550,470" />
+
+  <!-- Legend -->
+  <g transform="translate(20,10)">
+    <rect x="0" y="0" width="400" height="24" fill="none"/>
+    <text class="legend" x="0" y="14">
+      <tspan font-weight="700">Legend:</tspan>
+      <tspan> 1) Teams ▶ Bot endpoint  2) API GW ▶ Lambda  3) Lambda ▶ Bedrock  4) Lambda ▶ Graph (via 4b OAuth)  5) Logs ▶ S3  6) Metrics ▶ CloudWatch</tspan>
+    </text>
+  </g>
 </svg>

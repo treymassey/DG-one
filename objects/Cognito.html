@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bedrock Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-hcl.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background:#0f172a; color:#e5e7eb; }
+    pre { border-radius: 12px; padding: 16px; }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <h1>Bedrock Example</h1>
+  <a href="../index.html">← Back to Diagram</a>
+
+  <pre><code class="language-hcl">
+# Example Terraform for Bedrock
+resource "aws_bedrock_foundation_model" "example" {
+  model_id   = "anthropic.claude-v2"
+  provider   = "bedrock"
+}
+  </code></pre>
+</body>
+</html>

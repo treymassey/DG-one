@@ -1,46 +1,51 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Interactive Diagram</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Interactive Flow Diagram</title>
   <style>
     html, body {
       height: 100%;
       margin: 0;
-      background: #f9fafb; /* light gray background */
-      font-family: system-ui, sans-serif;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: #0b1220;
+      color: #e2e8f0;
     }
-    header {
-      padding: 10px 16px;
-      background: #111827;
-      color: #f9fafb;
-      font-size: 1.2rem;
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
     }
+    header { margin-bottom: 16px; }
     object {
       width: 100%;
-      height: calc(100% - 48px);
-      border: none;
+      height: 80vh;
+      border: 1px solid #334155;
+      background: #0f172a;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.35);
     }
+    .note {
+      font-size: 14px;
+      color: #94a3b8;
+      margin-top: 10px;
+    }
+    code { color: #93c5fd; }
   </style>
 </head>
 <body>
-  <header>
-    Interactive Flow Diagram
-  </header>
-
-  <!-- Embed your exported Visio SVG -->
-  <object id="diagram" type="image/svg+xml" data="diagram.svg"></object>
-
-  <script>
-    // Ensure hyperlinks inside the SVG work
-    document.getElementById('diagram').addEventListener('load', function () {
-      const svgDoc = this.contentDocument;
-      if (!svgDoc) return;
-      svgDoc.querySelectorAll('a').forEach(a => {
-        // open in same tab; change to "_blank" if you want new tab
-        a.setAttribute('target', '_self');
-      });
-    });
-  </script>
+  <div class="wrap">
+    <header>
+      <h1>Interactive Flow Diagram: Teams ↔ AWS Bedrock</h1>
+      <p class="note">
+        This page embeds <code>diagram.svg</code>. Click any box to open its detail page under <code>objects/</code>.
+      </p>
+    </header>
+    <object data="diagram.svg" type="image/svg+xml" aria-label="Teams to Bedrock architecture diagram">
+      Your browser does not support embedded SVG. 
+      Open <a href="diagram.svg">diagram.svg</a> directly.
+    </object>
+  </div>
 </body>
 </html>

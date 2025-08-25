@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bedrock Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-hcl.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background:#0f172a; color:#e5e7eb; }
+    pre { border-radius: 12px; padding: 16px; }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <h1>Bedrock Example</h1>
+  <a href="../index.html">← Back to Diagram</a>
+
+  <pre><code class="language-hcl">
+# Example Terraform for Bedrock
+|Creates App Registration: Project-Dev-EntraID
+|Sets Identifier URI: api://project-dev-bot
+|Creates Service Principal: allows sign-in and API access
+|Grants Graph Delegated permission: User.Read (add more as needed)
+|Creates client secret: usable as botAppPassword in your /Project-Dev/Entra secret
+
+# Connect as Global Admin
+Connect-MgGraph -Scopes "Application.ReadWrite.All","AppRoleAssignment.ReadWrite.All","Directory.ReadWrite.All"
+
+# PowerShell Script for Project-Dev-EntraID
+
+# Variables
+$displayName   = "Project-Dev-EntraID"
+$identifierUri = "api://project-dev-bot"
+$secretDesc    = "Project-Dev Secret"
+$secretYears   = 2   # secret expiry in years
+
+# 1. Create the App Registration
+$app = New-MgApplication -DisplayName $displayName -SignInAudience "AzureADMultipleOrgs" `
+  -Web @{ RedirectUris = @("https://token.botframework.com/.auth/web/redirect") } `
+  -IdentifierUris @($identifierUri)
+
+# 2. Create a Service Principal (enterprise app)
+$sp = New-MgServicePrincipal -AppId $app.AppId
+
+# 3. Add API permissions for Microsoft Graph
+# Delegated permissions
+$delegatedPerms = @("User.Read","offline_access","openid","profile","email")
+foreach ($perm in $delegatedPerms) {
+    $graphPerm = Get-MgServicePrincipal -Filter "AppId eq '00000003-0000-0000-c000-000000000000'" | 
+                 Get-MgServicePrincipalOauth2PermissionGrant -ErrorAction SilentlyContinue
+}
+
+# Easier: Assign Graph permissions directly (example: User.Read delegated)
+$graphSp = Get-MgServicePrincipal -Filter "AppId eq '00000003-0000-0000-c000-000000000000'"
+New-MgOauth2PermissionGrant -ClientId $sp.Id -ConsentType "AllPrincipals" `
+  -PrincipalId $null -ResourceId $graphSp.Id -Scope "User.Read"
+
+# 4. Create a client secret
+$pwdCred = Add-MgApplicationPassword -ApplicationId $app.Id `
+  -PasswordCredential @{ displayName = $secretDesc; endDateTime = (Get-Date).AddYears($secretYears) }
+
+Write-Host "App Registration created:"
+Write-Host "  DisplayName: $($app.DisplayName)"
+Write-Host "  Application (client) ID: $($app.AppId)"
+Write-Host "  Directory (tenant) ID:  $( (Get-MgContext).TenantId )"
+Write-Host "  Client Secret: $($pwdCred.SecretText)"
+
+
+
+  </code></pre>
+</body>
+</html>

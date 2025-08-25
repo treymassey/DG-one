@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bedrock Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-hcl.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background:#0f172a; color:#e5e7eb; }
+    pre { border-radius: 12px; padding: 16px; }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <h1>Bedrock Example</h1>
+  <a href="../index.html">← Back to Diagram</a>
+
+  <pre><code class="language-hcl">
+# Functions for Configuring Graph API
+# App Registration (Project-Dev-EntraID)
+
+Create an Entra App Registration to act as the bot’s identity.
+Functions:
+Provide Client ID, Tenant ID, Secret to AWS Secrets Manager (/Project-Dev/Entra).
+Enables OAuth for app-only or on-behalf-of (OBO) Graph calls.
+
+# API Permissions
+Configure Graph scopes your bot will need:
+Delegated permissions (for OBO / SSO scenarios):
+User.Read (baseline)
+Chat.Read, Chat.ReadWrite
+Calendars.ReadWrite
+Mail.ReadWrite (if email integration needed)
+Application permissions (for app-only flows):
+Chat.ReadWrite.All
+ChannelMessage.Send
+Calendars.ReadWrite
+User.Read.All
+Function: Controls what the bot can query or act on in Graph.
+Admin consent required for org-wide.
+
+# Secrets in AWS
+/Project-Dev/Entra in Secrets Manager holds:
+clientId, clientSecret, tenantId
+Function: Passed into Project-Dev-GraphFn Lambda to request tokens.
+
+# Token Acquisition Functions
+In GraphFn Lambda:
+App-only (Client Credentials flow):
+acquireTokenByClientCredential({ scopes: ["https://graph.microsoft.com/.default"] })
+
+On-Behalf-Of (OBO) (when Teams passes a user token):
+acquireTokenOnBehalfOf({ oboAssertion: userToken, scopes: ["User.Read"] })
+
+Function: Grants the bot access to Graph as itself (app-only) or as the user (OBO).
+
+# Graph API Calls
+Core functions you’d wire into commands:
+GET /me
+Verify identity, profile info
+Used in /graph me demo
+GET /me/chats
+List chats user is part of
+POST /chats/{chat-id}/messages
+Send messages into a chat
+GET /users/{id}/presence
+Check presence (optional feature)
+POST /me/events
+Create a calendar event
+GET /me/mailFolders/inbox/messages
+Read email messages
+
+# GraphFn Lambda Wrappers (Project-Dev-GraphFn)
+Functions already scaffolded:
+action = "me" → calls /me
+action = "chats" → calls /me/chats
+action = "sendtest" → posts a message (requires chatId in payload)
+
+You can extend with:
+action = "calendar" → create/list meetings
+action = "presence" → return presence
+action = "mail" → send/read emails
+
+# Bot Command Router
+In BotHandler Lambda:
+Detects /graph ... commands.
+Functions:
+Parse subcommand
+Invoke Project-Dev-GraphFn
+Format response back into Teams chat
+  </code></pre>
+</body>
+</html>

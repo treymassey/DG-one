@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bedrock Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-hcl.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background:#0f172a; color:#e5e7eb; }
+    pre { border-radius: 12px; padding: 16px; }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <h1>Bedrock Example</h1>
+  <a href="../index.html">← Back to Diagram</a>
+
+  <pre><code class="language-hcl">
+# Example Terraform for Bedrock
+1) Create the Entra app (Project‑Dev‑EntraID)
+Entra ID → App registrations → New registration
+
+Name: Project‑Dev‑EntraID
+Supported account types: Multitenant (or single‑tenant if you prefer)
+
+Record:
+Application (client) ID → this is your MicrosoftAppId
+Directory (tenant) ID
+Certificates & secrets → New client secret → copy the value (MicrosoftAppPassword).
+
+API permissions (Graph):
+Delegated: User.Read, openid, profile, email, offline_access (for SSO/OBO later)
+
+Grant admin consent
+AWS Secrets Manager at /Project-Dev/Entra (done in the AWS steps).
+
+2) Register a Bot Channels Registration
+Azure portal → Create resource → search Bot Channels Registration → Create.
+
+Set:
+MicrosoftAppId = Project‑Dev‑EntraID Client ID
+MicrosoftAppPassword = the secret you created
+Messaging endpoint = (fill in after AWS deploy)
+https://<api-id>.execute-api.<region>.amazonaws.com/prod/api/messages
+
+Save.
+This object is just a “pointer” so Teams knows where to POST activities. Compute runs in AWS.
+
+3) Prepare the Teams app package (manifest)
+
+In your repo’s teams/manifest.json (already included in the starter kit):
+"botId" → Project‑Dev‑EntraID clientId
+"validDomains" → "<api-id>.execute-api.<region>.amazonaws.com"
+"webApplicationInfo" (for SSO/OBO later):
+"webApplicationInfo": {
+  "id": "<Project-Dev-EntraID clientId>",
+  "resource": "api://<api-id>.execute-api.<region>.amazonaws.com/prod"
+}
+
+Zip exactly these three into a package:
+teams/
+  manifest.json
+  color.png
+  outline.png
+
+4) Enable custom app upload (tenant setting)
+Teams Admin Center → Teams apps → Setup policies
+Ensure Upload custom apps is allowed for your test policy/user.
+(If restricted) Use Developer Portal for Teams to sideload during dev.
+
+5) Upload the app to Teams
+Option A: Teams Admin Center → Manage apps → Upload new app → select the ZIP.
+Option B: Developer Portal for Teams → Apps → Import app → Test and Add to Teams.
+
+6) Configure the Bot channel for Teams (if not auto‑enabled)
+In your Bot resource, open Channels → Microsoft Teams → Enable (usually auto for Bot Channels Registration).
+
+7) Wire the Messaging endpoint once AWS is live
+After Terraform deploys, copy api_invoke_url and append /api/messages if needed.
+Go back to the Bot Channels Registration → Configuration → set Messaging endpoint to:
+https://<api-id>.execute-api.<region>.amazonaws.com/prod/api/messages
+
+  Save. Wait a minute for propagation.
+
+8) Add the bot to Teams and test
+In Teams, search for Project‑Dev Bot if org‑published, or install from Apps → Built for your org.
+DM the bot: hi → expect a Bedrock reply.
+In a team/channel: Apps → Add to a team → pick a team/channel → test message.
+Optional command from the starter: /graph me → expect JSON from Graph /me (app‑only until you wire SSO/OBO).
+
+9) (Optional) Teams SSO / OBO
+To pass user identity to Graph (On‑Behalf‑Of):
+In manifest.json, ensure webApplicationInfo.id = Entra clientId and resource matches your API.
+In Entra app → Expose an API: add an Application ID URI like
+api://<api-id>.execute-api.<region>.amazonaws.com/prod
+Configure Teams OAuth prompt / SSO in your bot (Botbuilder), capture the user token in channelData, and pass it to the backend (the starter has a placeholder field).
+  </code></pre>
+</body>
+</html>

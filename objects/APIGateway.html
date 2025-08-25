@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bedrock Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs/themes/prism.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/prism.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs/components/prism-hcl.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 20px; background:#0f172a; color:#e5e7eb; }
+    pre { border-radius: 12px; padding: 16px; }
+    a { color: #93c5fd; }
+  </style>
+</head>
+<body>
+  <h1>Bedrock Example</h1>
+  <a href="../index.html">← Back to Diagram</a>
+
+  <pre><code class="language-hcl">
+# AWS API Gateway - Configuration
+|Endpoint Teams calls: POST https://<api-id>.execute-api.<region>.amazonaws.com/prod/api/messages
+|Integration: → Lambda Project-Dev-BotHandler
+|Stage: prod (auto-deployed)
+--------------------------------------------
+|API Gateway HTTP API - h
+resource "aws_apigatewayv2_api" "http" {
+  name          = "${var.project_name}-HttpApi"     # → Project-Dev-HttpApi
+  protocol_type = "HTTP"
+}
+|Type: HTTP API (lighter than REST API v1).
+|Name: Project-Dev-HttpApi.
+|Protocol: HTTP.
+
+|Integration - h
+resource "aws_apigatewayv2_integration" "bot" {
+  api_id                 = aws_apigatewayv2_api.http.id
+  integration_type       = "AWS_PROXY"
+  integration_uri        = aws_lambda_function.bot.invoke_arn
+  payload_format_version = "2.0"
+}
+|Integration type: AWS_PROXY → full event passed to Lambda.
+|Integration target: Project-Dev-BotHandler Lambda.
+|Payload format: 2.0.
+
+|ROUTE - hcl
+resource "aws_apigatewayv2_route" "messages" {
+  api_id    = aws_apigatewayv2_api.http.id
+  route_key = "POST /api/messages"
+  target    = "integrations/${aws_apigatewayv2_integration.bot.id}"
+}
+|Route key: POST /api/messages (this is what Teams Bot Framework expects).
+|Target: bot integration.
+
+|Stage
+resource "aws_apigatewayv2_stage" "prod" {
+  api_id      = aws_apigatewayv2_api.http.id
+  name        = "prod"
+  auto_deploy = true
+}
+|Stage name: prod.
+|Auto-deploy: true (changes go live immediately)
+
+|Lambda Permission - prism-hcl
+resource "aws_lambda_permission" "apigw_invoke_bot" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.bot.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.http.execution_arn}/*/*/api/messages"
+}
+|Grants API Gateway permission to call Project-Dev-BotHandler.
+|Scoped to the route /api/messages.
+
+|Output - hcl
+output "api_invoke_url" {
+  value = "${aws_apigatewayv2_api.http.api_endpoint}/${aws_apigatewayv2_stage.prod.name}"
+}
+|This URL must be registered as the Messaging endpoint in the Azure Bot Channels Registration for Project-Dev-EntraID.
+
+  </code></pre>
+</body>
+</html>
