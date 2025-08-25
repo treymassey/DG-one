@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Interactive Diagram</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #f9fafb; /* light gray background */
+      font-family: system-ui, sans-serif;
+    }
+    header {
+      padding: 10px 16px;
+      background: #111827;
+      color: #f9fafb;
+      font-size: 1.2rem;
+    }
+    object {
+      width: 100%;
+      height: calc(100% - 48px);
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Interactive Flow Diagram
+  </header>
+
+  <!-- Embed your exported Visio SVG -->
+  <object id="diagram" type="image/svg+xml" data="diagram.svg"></object>
+
+  <script>
+    // Ensure hyperlinks inside the SVG work
+    document.getElementById('diagram').addEventListener('load', function () {
+      const svgDoc = this.contentDocument;
+      if (!svgDoc) return;
+      svgDoc.querySelectorAll('a').forEach(a => {
+        // open in same tab; change to "_blank" if you want new tab
+        a.setAttribute('target', '_self');
+      });
+    });
+  </script>
+</body>
+</html>
