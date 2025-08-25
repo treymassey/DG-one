@@ -1,0 +1,36 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 400" width="100%" height="100%">
+  <style>
+    .node { fill:#e5f0ff; stroke:#1f4aff; stroke-width:2; rx:12; ry:12; }
+    .label { font: 16px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; fill:#0b1220; }
+    a:hover .node { fill:#d6e7ff; }
+    a { cursor: pointer; }
+  </style>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" class="label" style="font-weight:600; font-size:20px">
+    Sample Diagram (Bedrock ⇄ Lamda)
+  </text>
+
+  <!-- Bedrock -->
+  <a xlink:href="objects/Bedrock.html" href="objects/Bedrock.html">
+    <title>Bedrock: click to open objects/Bedrock.html</title>
+    <rect class="node" x="120" y="140" width="220" height="90"></rect>
+    <text class="label" x="230" y="195" text-anchor="middle" pointer-events="none">Bedrock</text>
+  </a>
+
+  <!-- Connector arrow -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#1f4aff"></path>
+    </marker>
+  </defs>
+  <line x1="340" y1="185" x2="460" y2="185" stroke="#1f4aff" stroke-width="2" marker-end="url(#arrow)"></line>
+
+  <!-- Lamda -->
+  <a xlink:href="objects/Lamda.html" href="objects/Lamda.html">
+    <title>Lamda: click to open objects/Lamda.html</title>
+    <rect class="node" x="460" y="140" width="220" height="90"></rect>
+    <text class="label" x="570" y="195" text-anchor="middle" pointer-events="none">Lamda</text>
+  </a>
+</svg>
